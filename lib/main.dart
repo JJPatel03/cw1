@@ -28,11 +28,33 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
   int _counter = 0;
 
-  
   bool _isFirstImage = true;
+
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -40,11 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  
   void _toggleImage() {
     setState(() {
       _isFirstImage = !_isFirstImage;
     });
+    _controller.forward(from: 0.0); 
   }
 
   @override
@@ -66,21 +88,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
             const SizedBox(height: 30),
 
-            
-            Image.network(
-              _isFirstImage
-                  ? 'https://images.unsplash.com/photo-1630563451961-ac2ff27616ab?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-                  : 'https://orchardfruit.com/cdn/shop/files/Navel-Oranges-1-Pcs-The-Orchard-Fruit-72137770.jpg?crop=center&height=1200&v=1751051709&width=1200',
-              height: 150,
-              width: 150,
+            FadeTransition(
+              opacity: _animation,
+              child: Image.network(
+                _isFirstImage
+                    ? 'https://images.unsplash.com/photo-1630563451961-ac2ff27616ab?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                    : 'https://orchardfruit.com/cdn/shop/files/Navel-Oranges-1-Pcs-The-Orchard-Fruit-72137770.jpg?crop=center&height=1200&v=1751051709&width=1200',
+                height: 150,
+                width: 150,
+              ),
             ),
 
             const SizedBox(height: 20),
 
-            
             ElevatedButton(
               onPressed: _toggleImage,
-              child: Text(_isFirstImage ? 'Show Second Image' : 'Show First Image'),
+              child: Text(_isFirstImage ? 'Show First Image' : 'Show Second Image'),
             ),
           ],
         ),
